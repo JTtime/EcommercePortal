@@ -1,0 +1,47 @@
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+
+.MuiCard-root {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .MuiCard-root:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .MuiCardMedia-root {
+    transition: opacity 0.3s ease;
+    object-fit: cover; 
+  }
+  
+  .MuiCardMedia-root:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+.MuiGrid-item {
+    display: flex;
+    align-items: stretch;
+  }
+  
+  
+  
+  
+  
