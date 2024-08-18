@@ -2,53 +2,45 @@
 
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
-    const { login } = useAuth();
-    const router = useRouter();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-
+    const router = useRouter();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await login(username, password);
-            //   console.log('response', response)
-            if (response?.token) {
-                console.log('response', response)
+            const response = await fetch('https://dummyjson.com/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username,
+                    password,
+                })
+            });
+            const data = await response.json();
+
+            if (data?.token) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('refreshToken', data.refreshToken);
                 router.push('/home');
-                toast.success("login successful")
-            }
-            else {
-                // alert(response?.message)
-                setError(response?.message || 'Login failed');
-                toast.error("Enter Valid Email Id");
-                console.log('response message', response)
-
-                toast.error(response?.message)
-
-
+                toast.success("Login successful");
+            } else {
+                toast.error("Login failed");
             }
         } catch (error) {
             console.error('Login failed:', error);
-            setError('An unexpected error occurred.');
-            toast.error('login failed')
-
-
+            toast.error('An unexpected error occurred.');
         }
     };
 
     return (
         <Box sx={{ maxWidth: 400, margin: 'auto', padding: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                Login
-            </Typography>
+            <Typography variant="h4" gutterBottom>Login</Typography>
             <form onSubmit={handleSubmit}>
                 <TextField
                     label="Username"
@@ -67,11 +59,9 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button type="submit" variant="contained" color="primary" fullWidth>
-                    Login
-                </Button>
+                <Button type="submit" variant="contained" color="primary" fullWidth>Login</Button>
             </form>
-            <ToastContainer/>
+            <ToastContainer />
         </Box>
     );
 };

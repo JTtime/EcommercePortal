@@ -1,21 +1,14 @@
-import React, {useContext} from 'react'
-import { Box, Card, CardContent, CardMedia, Chip, Typography, CardActionArea, CardActions, Button } from '@mui/material'
+import React from 'react';
+import { Box, Card, CardContent, CardMedia, Chip, Typography, CardActionArea, CardActions, Button } from '@mui/material';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import { useTheme } from '@mui/material/styles';
-import { CartProvider, useCart } from '../../contexts/cartContext';
 
-
-
-function ProductCard({ product, toast, ToastContainer }) {
+const ProductCard = ({ product, addToCart }) => {
     const theme = useTheme();
-    // const { addToCart } = useContext(CartProvider);
-    const {addToCart} = useCart();
 
     const handleAddToCart = () => {
         addToCart(product);
-        toast.success(`${product.title} added to cart!`); 
     };
-
 
     return (
         <Card
@@ -34,8 +27,6 @@ function ProductCard({ product, toast, ToastContainer }) {
             }}
         >
             <CardActionArea sx={{ height: '100%' }}>
-
-
                 <CardMedia
                     component="img"
                     height="280"
@@ -53,11 +44,10 @@ function ProductCard({ product, toast, ToastContainer }) {
                     <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 1 }}>
                         {product.description}
                     </Typography>
-
                 </CardContent>
             </CardActionArea>
-            <CardActions sx={{ height: '100%', display: 'flex', alignItems: 'flex-end', marginBottom: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <CardActions sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: theme.spacing(1) }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="h6" sx={{ marginRight: 1 }}>
                         ${product.price.toFixed(2)}
                     </Typography>
@@ -76,15 +66,14 @@ function ProductCard({ product, toast, ToastContainer }) {
                 <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleAddToCart(product)}
+                    onClick={handleAddToCart}
                     sx={{ mt: 1 }}
                 >
                     Add to Cart
                 </Button>
-
             </CardActions>
         </Card>
-    )
-}
+    );
+};
 
-export default ProductCard
+export default ProductCard;

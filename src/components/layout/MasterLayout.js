@@ -1,25 +1,20 @@
 'use client';
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'; 
 import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button, Badge } from '@mui/material';
 import { Menu as MenuIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import DrawerComponent from './Drawer';
-import { useAuth } from '@/contexts/AuthContext';
-// import { CartContext } from '@/contexts/cartContext';
-import { useCart } from '@/contexts/cartContext';
-// import { CartContext } from '@/contexts/CartContext'; 
 
-
-export default function MasterLayout({ children }) {
+function MasterLayout({ children, user, cart, onLogout }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { user, logout } = useAuth();
-  // const { cart } = useContext(CartContext);
-  const { cart } = useCart();
-
-  // const { cart } = useCart();
   const router = useRouter();
-  // const user = null;
+
+  useEffect(() => {
+    // Update state if needed based on props or other conditions
+    console.log('user and cart', cart, user)
+  }, [user, cart]);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,13 +28,10 @@ export default function MasterLayout({ children }) {
     router.push('/login');
   };
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    onLogout();
     handleClose();
-    handleLoginSignup();
   };
-
-
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -57,7 +49,7 @@ export default function MasterLayout({ children }) {
           </Typography>
           {user && (
             <IconButton color="inherit" onClick={() => router.push('/cart')}>
-              <Badge badgeContent={cart.length} color="secondary">
+              <Badge badgeContent={cart.length || 0} color="secondary">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
@@ -92,7 +84,23 @@ export default function MasterLayout({ children }) {
         </Toolbar>
       </AppBar>
       <DrawerComponent open={drawerOpen} onClose={toggleDrawer(false)} />
-      <main>{children}</main>
+      <main>
+
+      {(user && cart?.length>0) ? React.Children.map(children, child => {
+          return React.cloneElement(child, { user, cart }); 
+        }): React.Children.map(children, child => {
+          return React.cloneElement(child); 
+        }) }
+        </main>
     </div>
   );
 }
+
+MasterLayout.PropTypes = {
+  user: PropTypes.object,
+  cart: PropTypes.array,
+  onLogout: PropTypes.func,
+  children: PropTypes.node.isRequired,
+};
+
+export default MasterLayout;

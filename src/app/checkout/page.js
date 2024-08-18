@@ -4,17 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Divider, Card, CardContent, Grid, Container, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { useCart } from '@/contexts/cartContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import CustomTextField from '@/components/sharedComponents/CustomTextField';
 import OrderSummaryCard from '@/components/sharedComponents/OrderSummaryCard';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
     const theme = useTheme();
-    const { cart } = useCart();
-    const { userData } = useAuth();
+    const [cart, setCart] = useState([]);
+    const [userData, setUserData] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -25,18 +24,59 @@ const CheckoutPage = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (userData) {
-            setFormData({
-                name: `${userData.firstName} ${userData.lastName}`,
-                email: userData.email,
-                address: userData.address.address,
-                city: userData.address.city,
-                state: userData.address.state,
-                postalCode: userData.address.postalCode,
-            });
+    const router = useRouter();
+
+    const fetchCartData = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await fetch(`https://dummyjson.com/carts/${userData?.id}`, { // Replace with actual endpoint
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const cartData = await response.json();
+                setCart(cartData.products || []);
+            } catch (error) {
+                console.error('Error fetching cart data:', error);
+                toast.error('Failed to fetch cart data');
+            }
         }
-    }, [userData]);
+    };
+
+    const fetchUserData = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await fetch('https://dummyjson.com/user/me', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await response.json();
+                setUserData(userData);
+                setFormData({
+                    name: `${userData?.firstName} ${userData?.lastName}`,
+                    email: userData?.email,
+                    address: userData?.address?.address,
+                    city: userData?.address?.city,
+                    state: userData?.address?.state,
+                    postalCode: userData?.address?.postalCode,
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                toast.error('Failed to fetch user data');
+            }
+        }
+    };
+
+    useEffect(() => {    
+
+        fetchUserData();
+    }, []);
+
+    useEffect(()=>{
+        fetchCartData();
+
+    },[userData])
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -49,10 +89,38 @@ const CheckoutPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => {
+        // toast.success('Order placed successfully!');
+        try {
+            const response = await fetch(`https://dummyjson.com/carts/${userData?.id}`, {
+                method: 'DELETE',
+              })
+              .then(res => res.json())
+              
+            // const response = await fetch('https://dummyjson.com/orders', { // Replace with actual endpoint
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+            //     },
+            //     body: JSON.stringify({
+            //         ...formData,
+            //         items: cart.map(item => ({ id: item.id, quantity: item.quantity }))
+            //     })
+            // });
+
+            if (response.ok) {
+                toast.success('Order placed successfully!');
+                router.push('/products-list');
+
+            } else {
+                toast.error('Failed to place order');
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            toast.error('Failed to place order');
+        } finally {
             setLoading(false);
-            toast.success('Order placed successfully!');
-        }, 2000);
+        }
     };
 
     return (
@@ -201,22 +269,19 @@ const CheckoutPage = () => {
                                 Order Summary
                             </Typography>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.background.paper }}>Total : </Typography>
+                                <Typography variant="h6" sx={{ color: theme.palette.background.paper }}>Total: </Typography>
                                 <Typography variant="h6"
                                     sx={{ color: theme.palette.background.paper, fontWeight: 'bold', marginLeft: '1rem' }} >
-
-                                     ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
+                                    ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
                                 </Typography>
                             </Box>
                         </Box>
 
                         <Box>
                             {cart.map((item) => (
-                                <OrderSummaryCard item={item}/>
-                                
+                                <OrderSummaryCard key={item.id} item={item} />
                             ))}
                             <Divider />
-
                         </Box>
                     </motion.div>
                     <ToastContainer />
