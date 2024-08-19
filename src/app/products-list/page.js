@@ -22,11 +22,18 @@ const ProductListingPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [cartId, setCartId] = useState(null);
     const [cart, setCart] = useRecoilState(cartItemsByUser);
+    const [token, setToken] = useState('')
 
     const limit = 8;
     const router = useRouter();
 
-    const token = localStorage.getItem('token');
+    useEffect(()=>{
+        const storedToken = localStorage.getItem('token');
+
+        setToken(storedToken)
+
+    },[])
+
 
 
     const fetchProducts = async (page = 1) => {
