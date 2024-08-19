@@ -5,16 +5,21 @@ import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button
 import { Menu as MenuIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import DrawerComponent from './Drawer';
+import { cartItemsByUser } from '@/recoil/cartAtoms';
+import { useRecoilState } from 'recoil';
+import { userDetails } from '@/recoil/userAtom';
 
 function MasterLayout({ children, user, cart, onLogout }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
+  const [localCart, setLocalCart] = useRecoilState(cartItemsByUser);
+  const [ localUser, setLocalUser] = useRecoilState(userDetails);
 
   useEffect(() => {
     // Update state if needed based on props or other conditions
-    console.log('user and cart', cart, user)
-  }, [user, cart]);
+    // console.log('user and cart', cart, user, localUser, localCart)
+  }, [user, cart, localCart]);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -30,6 +35,8 @@ function MasterLayout({ children, user, cart, onLogout }) {
 
   const handleLogout = () => {
     onLogout();
+    setLocalUser(null)
+    setLocalCart(null)
     handleClose();
   };
 
@@ -47,17 +54,17 @@ function MasterLayout({ children, user, cart, onLogout }) {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             E-Commerce Portal
           </Typography>
-          {user && (
+          {localUser && (
             <IconButton color="inherit" onClick={() => router.push('/cart')}>
-              <Badge badgeContent={cart.length || 0} color="secondary">
+              <Badge badgeContent={localCart?.length || 0} color="secondary">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
           )}
-          {user ? (
+          {localUser ? (
             <div>
               <IconButton onClick={handleMenu} color="inherit">
-                <Avatar alt="User Avatar" src={user.image || '/static/images/avatar/1.jpg'} />
+                <Avatar alt="User Avatar" src={localUser?.image || '/static/images/avatar/1.jpg'} />
               </IconButton>
               <Menu
                 id="menu-appbar"

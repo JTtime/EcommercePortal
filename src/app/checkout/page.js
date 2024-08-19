@@ -9,10 +9,13 @@ import OrderSummaryCard from '@/components/sharedComponents/OrderSummaryCard';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
+import { useRecoilState } from 'recoil';
+import { cartItemsByUser } from '@/recoil/cartAtoms';
 
 const CheckoutPage = () => {
     const theme = useTheme();
     const [cart, setCart] = useState([]);
+    const [localCart, setLocalCart] = useRecoilState(cartItemsByUser)
     const [userData, setUserData] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
@@ -30,7 +33,7 @@ const CheckoutPage = () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const response = await fetch(`https://dummyjson.com/carts/${userData?.id}`, { // Replace with actual endpoint
+                const response = await fetch(`https://dummyjson.com/carts/user/${userData?.id}`, { // Replace with actual endpoint
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -272,19 +275,21 @@ const CheckoutPage = () => {
                                 <Typography variant="h6" sx={{ color: theme.palette.background.paper }}>Total: </Typography>
                                 <Typography variant="h6"
                                     sx={{ color: theme.palette.background.paper, fontWeight: 'bold', marginLeft: '1rem' }} >
-                                    ${cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
+                                    ${localCart && localCart?.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
                                 </Typography>
                             </Box>
                         </Box>
 
                         <Box>
-                            {cart.map((item) => (
+                            {localCart && localCart?.map((item) => (
                                 <OrderSummaryCard key={item.id} item={item} />
                             ))}
                             <Divider />
                         </Box>
                     </motion.div>
-                    <ToastContainer />
+                    <ToastContainer
+                            autoClose={1000}
+                        />
                 </Paper>
             </Container>
         </Box>

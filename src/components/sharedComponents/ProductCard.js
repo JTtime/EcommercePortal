@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, CardContent, CardMedia, Chip, Typography, CardActionArea, CardActions, Button } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, Chip, Typography, CardActionArea, CardActions, Button, Stack } from '@mui/material';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import { useTheme } from '@mui/material/styles';
 
@@ -47,30 +47,40 @@ const ProductCard = ({ product, addToCart }) => {
                 </CardContent>
             </CardActionArea>
             <CardActions sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: theme.spacing(1) }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="h6" sx={{ marginRight: 1 }}>
-                        ${product.price.toFixed(2)}
-                    </Typography>
-                    {product.discountPercentage > 0 && (
-                        <Chip
-                            label={`-${product.discountPercentage.toFixed(2)}%`}
-                            color="warning"
-                            sx={{ marginLeft: 1 }}
-                        />
-                    )}
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <StarRateIcon color="warning" sx={{ marginRight: 0.5 }} />
-                    <Typography variant="body2">{product.rating.toFixed(1)}</Typography>
-                </Box>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAddToCart}
-                    sx={{ mt: 1 }}
-                >
-                    Add to Cart
-                </Button>
+                <Stack sx={{width: '100%'}}>
+                    
+                        <Box sx={{ width: '100%' , display: 'flex', justifyContent: 'space-between'}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography variant="h6" sx={{ marginRight: 1 }}>
+                                    ${product.price.toFixed(2)}
+                                </Typography>
+                                {product.discountPercentage > 0 && (
+                                    <Chip
+                                        label={`-${product.discountPercentage.toFixed(2)}%`}
+                                        color="warning"
+                                        sx={{ marginLeft: 1 }}
+                                    />
+                                )}
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <StarRateIcon color="warning" sx={{ marginRight: 0.5 }} />
+                                <Typography variant="body2">{product.rating.toFixed(1)}</Typography>
+                            </Box>
+                        </Box>
+                    
+                    
+                        <Box sx={{ width: '100%' }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleAddToCart}
+                                sx={{ mt: 1, height: '2rem', width: '100%' }}
+                            >
+                                Add to Cart
+                            </Button>
+                        </Box>
+                    
+                </Stack>
             </CardActions>
         </Card>
     );

@@ -7,11 +7,13 @@ import theme from '../styles/theme';
 import '../styles/globals.css';
 import MasterLayout from '@/components/layout/MasterLayout';
 import { RecoilRoot } from 'recoil';
+// import { userDetails } from '@/recoil/userAtom';
 
 
 export default function RootLayout({ children }) {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
+  // const [localUser, setLocalUser] = useRecoilState(userDetails)
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +26,7 @@ export default function RootLayout({ children }) {
       })
         .then(res => res.json())
         .then(userData => {
+          // setLocalUser(userData)
           setUser(userData);
           return fetch(`https://dummyjson.com/carts/user/${userData.id}`, {
             method: 'GET',
