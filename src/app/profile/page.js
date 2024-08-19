@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Avatar, Button, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserProfilePage = () => {
     const [user, setUser] = useState(null);
@@ -80,10 +82,11 @@ const UserProfilePage = () => {
                 {user?.email}
             </Typography>
             <Box sx={{ marginTop: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => router.push('/edit-profile')}>
+                <Button variant="contained" color="primary" onClick={() => toast.error('You are not admin')}>
                     Edit Profile
                 </Button>
             </Box>
+            <ToastContainer/>
         </Box>
     );
 };

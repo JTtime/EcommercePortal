@@ -1,10 +1,13 @@
+// import { Login } from '@mui/icons-material'
 import React from 'react'
+import LoginPage from './login/page'
 // import Home from '.components/home/page'
 
 function page() {
   return (
     <div>
-      {/* <Home /> */}this is home page.js
+      {/* <Home /> */}
+      <LoginPage/>
       
     </div>
   )
