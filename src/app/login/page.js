@@ -21,17 +21,20 @@ const LoginPage = () => {
                     username,
                     password,
                 })
-            });
-            const data = await response.json();
+            }).then(res => res.json()).then(data => {
+                if (data?.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    router.push('/products-list');
+                    toast.success("Login successful");
+                } else {
+                    toast.error("Login failed");
+                }
 
-            if (data?.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('refreshToken', data.refreshToken);
-                router.push('/products-list');
-                toast.success("Login successful");
-            } else {
-                toast.error("Login failed");
-            }
+            })
+            // const data = await response.json();
+
+
         } catch (error) {
             console.error('Login failed:', error);
             toast.error('An unexpected error occurred.');

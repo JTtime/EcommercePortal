@@ -52,6 +52,7 @@ const ProductListingPage = () => {
 
     const fetchUser = () => {
         try {
+            console.log('fetchusertoken', token)
 
             if (token) {
                 console.log('token', token)
@@ -70,12 +71,14 @@ const ProductListingPage = () => {
                     })
                     .then(res => res.json())
                     .then(cartData => setCart(cartData?.carts[0]?.products ? cartData?.carts[0]?.products : []))
-                    .catch(() => {
-                        localStorage.removeItem('token');
-                        router.push('/login');
+                    .catch((error) => {
+                        console.error('error fetching cart by user in productlisting', error)
+                        // localStorage.removeItem('token');
+                        // router.push('/login');
                     });
             } else {
-                router.push('/login');
+                console.log('logging out from here')
+                // router.push('/login');
             }
 
         } catch (error) {
@@ -105,13 +108,8 @@ const ProductListingPage = () => {
         }
     };
 
-    useLayoutEffect(() => {
-        if (token) {
-            fetchUser();
-        }
-        else {
-            router.push('/login');
-        }
+    useEffect(() => {
+       fetchUser()
     }, [token])
 
     useEffect(() => {
