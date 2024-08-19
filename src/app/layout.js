@@ -6,6 +6,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from '../styles/theme';
 import '../styles/globals.css';
 import MasterLayout from '@/components/layout/MasterLayout';
+import { RecoilRoot } from 'recoil';
+
 
 export default function RootLayout({ children }) {
   const [user, setUser] = useState(null);
@@ -20,20 +22,20 @@ export default function RootLayout({ children }) {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => res.json())
-      .then(userData => {
-        setUser(userData);
-        return fetch(`https://dummyjson.com/carts/${userData.id}`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` }
+        .then(res => res.json())
+        .then(userData => {
+          setUser(userData);
+          return fetch(`https://dummyjson.com/carts/user/${userData.id}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        })
+        .then(res => res.json())
+        .then(cartData => setCart(cartData?.products ? cartData?.products : []))  // Use the first cart if multiple
+        .catch(() => {
+          localStorage.removeItem('token');
+          router.push('/login');
         });
-      })
-      .then(res => res.json())
-      .then(cartData => setCart(cartData?.products ? cartData?.products : []))  // Use the first cart if multiple
-      .catch(() => {
-        localStorage.removeItem('token');
-        router.push('/login');
-      });
     } else {
       router.push('/login');
     }
@@ -41,6 +43,8 @@ export default function RootLayout({ children }) {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+
     setUser(null);
     setCart([]);
     router.push('/login');
@@ -50,10 +54,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <ThemeProvider theme={theme}>
-          <MasterLayout user={user} cart={cart} onLogout={handleLogout}>
-            <CssBaseline />
-            {children}
-          </MasterLayout>
+          <RecoilRoot>
+            <MasterLayout user={user} cart={cart} onLogout={handleLogout}>
+              <CssBaseline />
+              {children}
+            </MasterLayout>
+          </RecoilRoot>
         </ThemeProvider>
       </body>
     </html>

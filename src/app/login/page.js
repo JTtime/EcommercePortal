@@ -27,7 +27,7 @@ const LoginPage = () => {
             if (data?.token) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('refreshToken', data.refreshToken);
-                router.push('/home');
+                router.push('/products-list');
                 toast.success("Login successful");
             } else {
                 toast.error("Login failed");
